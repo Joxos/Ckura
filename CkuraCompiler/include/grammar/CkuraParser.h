@@ -158,7 +158,7 @@ public:
     MinusLevelContext(ExpressionContext *ctx);
 
     antlr4::tree::TerminalNode *MINUS();
-    ExpressionContext *expression();
+    LiteralValueContext *literalValue();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

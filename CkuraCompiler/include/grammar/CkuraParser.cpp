@@ -70,7 +70,7 @@ void ckuraparserParserInitialize() {
   	1,0,0,0,12,66,1,0,0,0,14,71,1,0,0,0,16,20,5,29,0,0,17,20,5,30,0,0,18,
   	20,5,28,0,0,19,16,1,0,0,0,19,17,1,0,0,0,19,18,1,0,0,0,20,1,1,0,0,0,21,
   	22,6,1,-1,0,22,30,3,0,0,0,23,24,5,6,0,0,24,25,3,2,1,0,25,26,5,7,0,0,26,
-  	30,1,0,0,0,27,28,5,16,0,0,28,30,3,2,1,4,29,21,1,0,0,0,29,23,1,0,0,0,29,
+  	30,1,0,0,0,27,28,5,16,0,0,28,30,3,0,0,0,29,21,1,0,0,0,29,23,1,0,0,0,29,
   	27,1,0,0,0,30,51,1,0,0,0,31,32,10,7,0,0,32,33,5,18,0,0,33,50,3,2,1,8,
   	34,35,10,6,0,0,35,36,7,0,0,0,36,50,3,2,1,7,37,38,10,5,0,0,38,39,7,1,0,
   	0,39,50,3,2,1,6,40,41,10,3,0,0,41,42,7,2,0,0,42,50,3,2,1,4,43,44,10,2,
@@ -361,8 +361,8 @@ tree::TerminalNode* CkuraParser::MinusLevelContext::MINUS() {
   return getToken(CkuraParser::MINUS, 0);
 }
 
-CkuraParser::ExpressionContext* CkuraParser::MinusLevelContext::expression() {
-  return getRuleContext<CkuraParser::ExpressionContext>(0);
+CkuraParser::LiteralValueContext* CkuraParser::MinusLevelContext::literalValue() {
+  return getRuleContext<CkuraParser::LiteralValueContext>(0);
 }
 
 CkuraParser::MinusLevelContext::MinusLevelContext(ExpressionContext *ctx) { copyFrom(ctx); }
@@ -539,7 +539,7 @@ CkuraParser::ExpressionContext* CkuraParser::expression(int precedence) {
         setState(27);
         match(CkuraParser::MINUS);
         setState(28);
-        expression(4);
+        literalValue();
         break;
       }
 

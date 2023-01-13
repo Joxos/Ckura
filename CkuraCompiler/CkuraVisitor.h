@@ -97,7 +97,6 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
       // explose
     }
     if (op == "+") {
-      llvm_builder->CreateFAdd(l, r, "addtmp")->print(errs());
       return llvm_builder->CreateFAdd(l, r, "addtmp");
     } else if (op == "-") {
       return llvm_builder->CreateFSub(l, r, "subtmp");
@@ -107,7 +106,15 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
   virtual std::any visitMinusLevel(
       CkuraParser::MinusLevelContext *ctx) override {
-    Value *expr = any_cast<ConstantFP *>(visit(ctx->expression()));
+    any e = visit(ctx->literalValue());
+    Value *expr;
+    if (e.type() == typeid(Value *)) {
+      expr = any_cast<Value *>(e);
+    } else if (e.type() == typeid(ConstantFP *)) {
+      expr = any_cast<ConstantFP *>(e);
+    } else {
+      // explose
+    }
     Value *zero = ConstantFP::get(*llvm_context, APFloat((double)0));
     return llvm_builder->CreateFSub(zero, expr, "subtmp");
   }

@@ -15,7 +15,7 @@ expression
     | expression op=POWER expression  # powerLevel
     | expression op=(STAR|DIV|MOD) expression  # multiLevel
     | expression op=(ADD|MINUS) expression # addLevel
-    | MINUS expression # minusLevel
+    | MINUS literalValue # minusLevel
     | expression op=(EQUAL|NOT_EQ|GREATER_THAN|LESS_THAN) expression  # eqLevel
     | expression op=AND expression  # andLevel
     | expression op=OR expression  # orLevel
