@@ -2,4 +2,4 @@
 
 project ("Ckura")
 
-add_subdirectory ("Ckura")
+add_subdirectory ("CkuraCompiler")

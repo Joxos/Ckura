@@ -36,5 +36,5 @@ target_link_libraries (ckura ${llvm_libs})
 # copy dll
 message ("${CMAKE_SOURCE_DIR}")
 add_custom_command (TARGET ckura POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/Ckura/antlr4-runtime.dll
-                    ${CMAKE_CURRENT_BINARY_DIR}/antlr4-runtime.dll)
+                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/CkuraCompiler/antlr4-runtime.dll
+                    ${CMAKE_CURRENT_BINARY_DIR}/Debug/antlr4-runtime.dll)
