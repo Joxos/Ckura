@@ -1,3 +1,4 @@
+// antlr4.exe -no-listener -visitor .\CkuraLexer.g4 .\CkuraParser.g4
 lexer grammar CkuraLexer;
 options { language=Cpp; }
 
@@ -25,6 +26,7 @@ MOD: '%';
 ADD: '+';
 AND: 'and';
 OR: 'or';
+NEXT_LINE: '\n';
 
 Comment
     : DIV DIV ~[\r\n\f]* -> channel(HIDDEN);
@@ -43,9 +45,7 @@ Id
     : (Alpha|UNDERLINE) (Char|UNDERLINE)*;
 String
     : QUOTE ~["\\\r\n]+? QUOTE;
-// TODO: MINUS Lex
-Integer
+fragment Integer
     : (NonZeroDigit Digit*)|'0';
-Decimal
-    : Integer DOT Digit* NonZeroDigit;
-
+Number
+    : Integer (DOT Digit* NonZeroDigit)?;

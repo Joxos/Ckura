@@ -6,8 +6,7 @@ options {
 
 literalValue
     : String  # string
-    | Integer  # integer
-    | Decimal  # decimal
+    | Number # number
     | Id  # id
     ;
 expression
@@ -16,6 +15,7 @@ expression
     | expression op=POWER expression  # powerLevel
     | expression op=(STAR|DIV|MOD) expression  # multiLevel
     | expression op=(ADD|MINUS) expression # addLevel
+    | MINUS expression # minusLevel
     | expression op=(EQUAL|NOT_EQ|GREATER_THAN|LESS_THAN) expression  # eqLevel
     | expression op=AND expression  # andLevel
     | expression op=OR expression  # orLevel
@@ -24,6 +24,12 @@ declareVariable
     : expression Id;
 defineVariable
     : declareVariable EQ expression;
+statement
+    : defineVariable
+    ;
+unit: statement NEXT_LINE;
+lastUnit: statement;
+module: unit* lastUnit?;
 // statement
 //     :
 //     ( defineVariable
