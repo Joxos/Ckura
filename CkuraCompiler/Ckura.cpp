@@ -10,6 +10,8 @@ extern unique_ptr<LLVMContext> llvm_context;
 extern unique_ptr<Module> llvm_module;
 extern unique_ptr<IRBuilder<>> llvm_builder;
 
+//extern map<string, Value> memory;
+
 int main(int argc, char *argv[]) {
   // set log level
   set_level(level::debug);
