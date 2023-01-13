@@ -13,29 +13,28 @@ set (CMAKE_CXX_STANDARD 17)
 
 # set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#include_directories (../include/antlr4/
-#                     ../include/grammar/
-#                     ../include/clipp/
-include_directories (${LLVM_INCLUDE_DIRS})
+include_directories (./include/antlr4/
+                     ./include/grammar/
+                     ./include/clipp/
+                     ${LLVM_INCLUDE_DIRS})
 
 separate_arguments (LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions (${LLVM_DEFINITIONS_LIST})
 
-#link_directories (../lib/)
+link_directories (./lib/)
 
-add_executable (ckura Ckura.cpp)
-#                      ../include/grammar/ckuraBaseVisitor.cpp
-#                      ../include/grammar/ckuraLexer.cpp
-#                     ../include/grammar/ckuraParser.cpp)
+add_executable (ckura Ckura.cpp
+                      ./include/grammar/CkuraParserBaseVisitor.cpp
+                      ./include/grammar/CkuraLexer.cpp
+                      ./include/grammar/CkuraParser.cpp)
 
 llvm_map_components_to_libnames (llvm_libs support core irreader)
 
-#target_link_libraries (ckura antlr4-runtime)
+target_link_libraries (ckura antlr4-runtime)
 target_link_libraries (ckura ${llvm_libs})
 
 # copy dll
-#add_custom_command(
-#        TARGET ckura POST_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy
-#                ../dll/antlr4-runtime.dll
-#                ${CMAKE_CURRENT_BINARY_DIR}/antlr4-runtime.dll)
+message ("${CMAKE_SOURCE_DIR}")
+add_custom_command (TARGET ckura POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/Ckura/antlr4-runtime.dll
+                    ${CMAKE_CURRENT_BINARY_DIR}/antlr4-runtime.dll)
