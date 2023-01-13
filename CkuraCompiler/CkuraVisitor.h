@@ -47,8 +47,24 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   virtual std::any visitMultiLevel(
       CkuraParser::MultiLevelContext *ctx) override {
     string op = ctx->op->getText();
-    Value *l = any_cast<ConstantFP *>(visit(ctx->expression()[0]));
-    Value *r = any_cast<ConstantFP *>(visit(ctx->expression()[1]));
+    any left = visit(ctx->expression()[0]);
+    any right = visit(ctx->expression()[1]);
+    Value *l;
+    if (left.type() == typeid(Value *)) {
+      l = any_cast<Value *>(left);
+    } else if (left.type() == typeid(ConstantFP *)) {
+      l = any_cast<ConstantFP *>(left);
+    } else {
+      // explose
+    }
+    Value *r;
+    if (right.type() == typeid(Value *)) {
+      r = any_cast<Value *>(right);
+    } else if (right.type() == typeid(ConstantFP *)) {
+      r = any_cast<ConstantFP *>(right);
+    } else {
+      // explose
+    }
     if (op == "*") {
       return llvm_builder->CreateFMul(l, r, "multmp");
     } else if (op == "/") {
@@ -62,9 +78,26 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
   virtual std::any visitAddLevel(CkuraParser::AddLevelContext *ctx) override {
     string op = ctx->op->getText();
-    Value *l = any_cast<ConstantFP *>(visit(ctx->expression()[0]));
-    Value *r = any_cast<ConstantFP *>(visit(ctx->expression()[1]));
+    any left = visit(ctx->expression()[0]);
+    any right = visit(ctx->expression()[1]);
+    Value *l;
+    if (left.type() == typeid(Value *)) {
+      l = any_cast<Value *>(left);
+    } else if (left.type() == typeid(ConstantFP *)) {
+      l = any_cast<ConstantFP *>(left);
+    } else {
+      // explose
+    }
+    Value *r;
+    if (right.type() == typeid(Value *)) {
+      r = any_cast<Value *>(right);
+    } else if (right.type() == typeid(ConstantFP *)) {
+      r = any_cast<ConstantFP *>(right);
+    } else {
+      // explose
+    }
     if (op == "+") {
+      llvm_builder->CreateFAdd(l, r, "addtmp")->print(errs());
       return llvm_builder->CreateFAdd(l, r, "addtmp");
     } else if (op == "-") {
       return llvm_builder->CreateFSub(l, r, "subtmp");
