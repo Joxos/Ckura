@@ -1,23 +1,48 @@
 ﻿#include <iostream>
 
 #include "CkuraVisitor.h"
+#include "clipp.h"
 
 using namespace std;
 using namespace llvm;
+using clipp::option;
+using clipp::value;
 
 extern unique_ptr<LLVMContext> llvm_context;
 extern unique_ptr<Module> llvm_module;
 extern unique_ptr<IRBuilder<>> llvm_builder;
 
-int main() {
+int main(int argc, char *argv[]) {
+  // parse cli
+  string input_file = "", output_file = "";
+  auto cli = (value("input file", input_file),
+              option("-o") & value("output file", output_file));
+  if (!parse(argc, argv, cli)) {
+    cout << make_man_page(cli, argv[0]);
+    exit(-1);
+  }
+
   // init llvm
   llvm_context = make_unique<LLVMContext>();
   llvm_module = make_unique<Module>("my cool jit", *llvm_context);
   llvm_builder = make_unique<IRBuilder<>>(*llvm_context);
 
-  auto a = ConstantFP::get(*llvm_context, APFloat(3.8));
-  auto b = ConstantFP::get(*llvm_context, APFloat(5.2));
-  llvm_builder->CreateFAdd(a, b, "addtmp");
+  // antlr4 lex and parse
+  cout << "Start lexing with input file " << input_file << "." << endl;
+  ifstream stream(input_file);
+  antlr4::ANTLRInputStream input(stream);
+  CkuraLexer lexer(&input);
+  antlr4::CommonTokenStream tokens(&lexer);
+  cout << "Start parsing...";
+  CkuraParser parser(&tokens);
+  cout << "Parse complete." << endl;
+  stream.close();
+
+  antlr4::tree::ParseTree *tree = parser.expression();
+  cout << "Start visiting...";
+  CkuraVisitor visitor;
+  visitor.visit(tree);
+  cout << "Visit complete." << endl;
   llvm_module->dump();
   return 0;
 }
