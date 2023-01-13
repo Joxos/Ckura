@@ -16,12 +16,13 @@ public:
     CLOSE_PAREN = 7, OPEN_BRACE = 8, CLOSE_BRACE = 9, ARROW = 10, EQ = 11, 
     EQUAL = 12, NOT_EQ = 13, GREATER_THAN = 14, LESS_THAN = 15, MINUS = 16, 
     DOT = 17, POWER = 18, STAR = 19, DIV = 20, MOD = 21, ADD = 22, AND = 23, 
-    OR = 24, Comment = 25, WS = 26, Id = 27, String = 28, Integer = 29, 
-    Decimal = 30
+    OR = 24, NEXT_LINE = 25, Comment = 26, WS = 27, Id = 28, String = 29, 
+    Number = 30
   };
 
   enum {
-    RuleLiteralValue = 0, RuleExpression = 1, RuleDeclareVariable = 2, RuleDefineVariable = 3
+    RuleLiteralValue = 0, RuleExpression = 1, RuleDeclareVariable = 2, RuleDefineVariable = 3, 
+    RuleStatement = 4, RuleUnit = 5, RuleLastUnit = 6, RuleModule = 7
   };
 
   explicit CkuraParser(antlr4::TokenStream *input);
@@ -44,7 +45,11 @@ public:
   class LiteralValueContext;
   class ExpressionContext;
   class DeclareVariableContext;
-  class DefineVariableContext; 
+  class DefineVariableContext;
+  class StatementContext;
+  class UnitContext;
+  class LastUnitContext;
+  class ModuleContext; 
 
   class  LiteralValueContext : public antlr4::ParserRuleContext {
   public:
@@ -59,6 +64,15 @@ public:
    
   };
 
+  class  NumberContext : public LiteralValueContext {
+  public:
+    NumberContext(LiteralValueContext *ctx);
+
+    antlr4::tree::TerminalNode *Number();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  StringContext : public LiteralValueContext {
   public:
     StringContext(LiteralValueContext *ctx);
@@ -68,29 +82,11 @@ public:
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  IntegerContext : public LiteralValueContext {
-  public:
-    IntegerContext(LiteralValueContext *ctx);
-
-    antlr4::tree::TerminalNode *Integer();
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  IdContext : public LiteralValueContext {
   public:
     IdContext(LiteralValueContext *ctx);
 
     antlr4::tree::TerminalNode *Id();
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  DecimalContext : public LiteralValueContext {
-  public:
-    DecimalContext(LiteralValueContext *ctx);
-
-    antlr4::tree::TerminalNode *Decimal();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
@@ -153,6 +149,16 @@ public:
     ExpressionContext* expression(size_t i);
     antlr4::tree::TerminalNode *ADD();
     antlr4::tree::TerminalNode *MINUS();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  MinusLevelContext : public ExpressionContext {
+  public:
+    MinusLevelContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *MINUS();
+    ExpressionContext *expression();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
@@ -238,6 +244,61 @@ public:
   };
 
   DefineVariableContext* defineVariable();
+
+  class  StatementContext : public antlr4::ParserRuleContext {
+  public:
+    StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    DefineVariableContext *defineVariable();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  StatementContext* statement();
+
+  class  UnitContext : public antlr4::ParserRuleContext {
+  public:
+    UnitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    StatementContext *statement();
+    antlr4::tree::TerminalNode *NEXT_LINE();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  UnitContext* unit();
+
+  class  LastUnitContext : public antlr4::ParserRuleContext {
+  public:
+    LastUnitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    StatementContext *statement();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  LastUnitContext* lastUnit();
+
+  class  ModuleContext : public antlr4::ParserRuleContext {
+  public:
+    ModuleContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<UnitContext *> unit();
+    UnitContext* unit(size_t i);
+    LastUnitContext *lastUnit();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ModuleContext* module();
 
 
   bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;

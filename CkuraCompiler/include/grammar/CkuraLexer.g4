@@ -29,7 +29,7 @@ OR: 'or';
 NEXT_LINE: '\n';
 
 Comment
-    : DIV DIV ~[\r\n\f]* -> channel(HIDDEN);
+    : DIV DIV ~[\r\n\f]* NEXT_LINE -> channel(HIDDEN);
 WS
     : [ \r\t\n\f]+ -> channel(HIDDEN);
 

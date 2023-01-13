@@ -19,11 +19,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitInteger(CkuraParser::IntegerContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual std::any visitDecimal(CkuraParser::DecimalContext *ctx) override {
+  virtual std::any visitNumber(CkuraParser::NumberContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -44,6 +40,10 @@ public:
   }
 
   virtual std::any visitAddLevel(CkuraParser::AddLevelContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitMinusLevel(CkuraParser::MinusLevelContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -68,6 +68,22 @@ public:
   }
 
   virtual std::any visitDefineVariable(CkuraParser::DefineVariableContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitStatement(CkuraParser::StatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitUnit(CkuraParser::UnitContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitLastUnit(CkuraParser::LastUnitContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitModule(CkuraParser::ModuleContext *ctx) override {
     return visitChildren(ctx);
   }
 

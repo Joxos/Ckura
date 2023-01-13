@@ -3,8 +3,6 @@
 #include "CkuraVisitor.h"
 #include "clipp.h"
 
-using namespace std;
-using namespace llvm;
 using clipp::option;
 using clipp::value;
 
@@ -13,6 +11,8 @@ extern unique_ptr<Module> llvm_module;
 extern unique_ptr<IRBuilder<>> llvm_builder;
 
 int main(int argc, char *argv[]) {
+  // set log level
+  set_level(level::debug);
   // parse cli
   string input_file = "", output_file = "";
   auto cli = (value("input file", input_file),
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   stream.close();
 
   antlr4::tree::ParseTree *tree = parser.expression();
-  cout << "Start visiting...";
+  cout << "Start visiting..." << endl;
   CkuraVisitor visitor;
   visitor.visit(tree);
   cout << "Visit complete." << endl;

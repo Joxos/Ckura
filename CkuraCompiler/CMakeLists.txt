@@ -6,6 +6,12 @@ find_package (LLVM REQUIRED CONFIG)
 message (STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message (STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
+if (NOT TARGET spdlog)
+    # Stand-alone build
+    find_package (spdlog REQUIRED)
+    message (STATUS "Found spdlog")
+endif()
+
 set (CMAKE_CXX_STANDARD 17)
 # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fsanitize=address -fno-omit-frame-pointer")
 # set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -v")
@@ -32,6 +38,7 @@ llvm_map_components_to_libnames (llvm_libs support core irreader)
 
 target_link_libraries (ckura antlr4-runtime)
 target_link_libraries (ckura ${llvm_libs})
+target_link_libraries (ckura spdlog::spdlog)
 
 # copy dll
 message ("${CMAKE_SOURCE_DIR}")

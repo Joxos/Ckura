@@ -21,9 +21,7 @@ public:
    */
     virtual std::any visitString(CkuraParser::StringContext *context) = 0;
 
-    virtual std::any visitInteger(CkuraParser::IntegerContext *context) = 0;
-
-    virtual std::any visitDecimal(CkuraParser::DecimalContext *context) = 0;
+    virtual std::any visitNumber(CkuraParser::NumberContext *context) = 0;
 
     virtual std::any visitId(CkuraParser::IdContext *context) = 0;
 
@@ -34,6 +32,8 @@ public:
     virtual std::any visitLiteralLevel(CkuraParser::LiteralLevelContext *context) = 0;
 
     virtual std::any visitAddLevel(CkuraParser::AddLevelContext *context) = 0;
+
+    virtual std::any visitMinusLevel(CkuraParser::MinusLevelContext *context) = 0;
 
     virtual std::any visitPowerLevel(CkuraParser::PowerLevelContext *context) = 0;
 
@@ -46,6 +46,14 @@ public:
     virtual std::any visitDeclareVariable(CkuraParser::DeclareVariableContext *context) = 0;
 
     virtual std::any visitDefineVariable(CkuraParser::DefineVariableContext *context) = 0;
+
+    virtual std::any visitStatement(CkuraParser::StatementContext *context) = 0;
+
+    virtual std::any visitUnit(CkuraParser::UnitContext *context) = 0;
+
+    virtual std::any visitLastUnit(CkuraParser::LastUnitContext *context) = 0;
+
+    virtual std::any visitModule(CkuraParser::ModuleContext *context) = 0;
 
 
 };
