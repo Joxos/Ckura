@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include "CkuraLexer.h"
 #include "CkuraParserBaseVisitor.h"
@@ -20,23 +20,28 @@ unique_ptr<LLVMContext> llvm_context;
 unique_ptr<Module> llvm_module;
 unique_ptr<IRBuilder<>> llvm_builder;
 
+unordered_map<string, Value *> memory;
+
 class CkuraVisitor : public CkuraParserBaseVisitor {
  public:
   any visitString(CkuraParser::StringContext *ctx) override {
     // take the quotes
-    info("visit string {}", ctx->String()->getText());
     return ctx->String()->getText();
   }
 
   any visitNumber(CkuraParser::NumberContext *ctx) override {
-    info("visit number {}", (string)ctx->Number()->getText());
-    return ConstantFP::get(*llvm_context,
-                           APFloat(stod(ctx->Number()->getText())));
+    return (Value *)ConstantFP::get(*llvm_context,
+                                    APFloat(stod(ctx->Number()->getText())));
   }
 
   virtual std::any visitId(CkuraParser::IdContext *ctx) override {
-    info("visit id {}", ctx->Id()->getText());
-    return visitChildren(ctx);
+    Value *v = memory[ctx->Id()->getText()];
+    if (!v) {
+      // ops!
+      exit(-1);
+    } else {
+      return v;
+    }
   }
 
   virtual std::any visitParenLevel(
@@ -47,24 +52,8 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   virtual std::any visitMultiLevel(
       CkuraParser::MultiLevelContext *ctx) override {
     string op = ctx->op->getText();
-    any left = visit(ctx->expression()[0]);
-    any right = visit(ctx->expression()[1]);
-    Value *l;
-    if (left.type() == typeid(Value *)) {
-      l = any_cast<Value *>(left);
-    } else if (left.type() == typeid(ConstantFP *)) {
-      l = any_cast<ConstantFP *>(left);
-    } else {
-      // explose
-    }
-    Value *r;
-    if (right.type() == typeid(Value *)) {
-      r = any_cast<Value *>(right);
-    } else if (right.type() == typeid(ConstantFP *)) {
-      r = any_cast<ConstantFP *>(right);
-    } else {
-      // explose
-    }
+    Value *l = any_cast<Value *>(visit(ctx->expression()[0]));
+    Value *r = any_cast<Value *>(visit(ctx->expression()[1]));
     if (op == "*") {
       return llvm_builder->CreateFMul(l, r, "multmp");
     } else if (op == "/") {
@@ -78,24 +67,8 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
   virtual std::any visitAddLevel(CkuraParser::AddLevelContext *ctx) override {
     string op = ctx->op->getText();
-    any left = visit(ctx->expression()[0]);
-    any right = visit(ctx->expression()[1]);
-    Value *l;
-    if (left.type() == typeid(Value *)) {
-      l = any_cast<Value *>(left);
-    } else if (left.type() == typeid(ConstantFP *)) {
-      l = any_cast<ConstantFP *>(left);
-    } else {
-      // explose
-    }
-    Value *r;
-    if (right.type() == typeid(Value *)) {
-      r = any_cast<Value *>(right);
-    } else if (right.type() == typeid(ConstantFP *)) {
-      r = any_cast<ConstantFP *>(right);
-    } else {
-      // explose
-    }
+    Value *l = any_cast<Value *>(visit(ctx->expression()[0]));
+    Value *r = any_cast<Value *>(visit(ctx->expression()[1]));
     if (op == "+") {
       return llvm_builder->CreateFAdd(l, r, "addtmp");
     } else if (op == "-") {
@@ -106,15 +79,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
   virtual std::any visitMinusLevel(
       CkuraParser::MinusLevelContext *ctx) override {
-    any e = visit(ctx->literalValue());
-    Value *expr;
-    if (e.type() == typeid(Value *)) {
-      expr = any_cast<Value *>(e);
-    } else if (e.type() == typeid(ConstantFP *)) {
-      expr = any_cast<ConstantFP *>(e);
-    } else {
-      // explose
-    }
+    Value *expr = any_cast<Value *>(visit(ctx->literalValue()));
     Value *zero = ConstantFP::get(*llvm_context, APFloat((double)0));
     return llvm_builder->CreateFSub(zero, expr, "subtmp");
   }
