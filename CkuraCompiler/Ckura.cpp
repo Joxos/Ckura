@@ -40,11 +40,12 @@ int main(int argc, char *argv[]) {
   cout << "Parse complete." << endl;
   stream.close();
 
-  antlr4::tree::ParseTree *tree = parser.expression();
+  antlr4::tree::ParseTree *tree = parser.module();
   cout << "Start visiting..." << endl;
   CkuraVisitor visitor;
   visitor.visit(tree);
   cout << "Visit complete." << endl;
+  visitor.accessVariable("number")->print(errs());
   llvm_module->dump();
   return 0;
 }

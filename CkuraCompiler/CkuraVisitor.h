@@ -24,6 +24,16 @@ unordered_map<string, Value *> memory;
 
 class CkuraVisitor : public CkuraParserBaseVisitor {
  public:
+  Value *accessVariable(string var_name) {
+    Value *v = memory[var_name];
+    if (!v) {
+      // ops!
+      exit(-1);
+    } else {
+      return v;
+    }
+  }
+
   any visitString(CkuraParser::StringContext *ctx) override {
     // take the quotes
     return ctx->String()->getText();
@@ -86,6 +96,10 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
   virtual std::any visitDefineVariable(
       CkuraParser::DefineVariableContext *ctx) override {
-    return visitChildren(ctx);
+    auto type = ctx->declareVariable()->expression();
+    memory.insert(
+        pair<string, Value *>(ctx->declareVariable()->Id()->getText(),
+                              any_cast<Value *>(visit(ctx->expression()))));
+    return nullptr;
   }
 };
