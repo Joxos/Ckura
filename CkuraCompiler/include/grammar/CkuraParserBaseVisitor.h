@@ -31,6 +31,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitFuncCallLevel(CkuraParser::FuncCallLevelContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitParenLevel(CkuraParser::ParenLevelContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -71,15 +75,39 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitFunctionBody(CkuraParser::FunctionBodyContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionArgument(CkuraParser::FunctionArgumentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionHead(CkuraParser::FunctionHeadContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionReturn(CkuraParser::FunctionReturnContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitDefineFunction(CkuraParser::DefineFunctionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionCall(CkuraParser::FunctionCallContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitStatement(CkuraParser::StatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitUnit(CkuraParser::UnitContext *ctx) override {
+  virtual std::any visitBlock(CkuraParser::BlockContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitLastUnit(CkuraParser::LastUnitContext *ctx) override {
+  virtual std::any visitUnit(CkuraParser::UnitContext *ctx) override {
     return visitChildren(ctx);
   }
 

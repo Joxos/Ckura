@@ -16,8 +16,8 @@ public:
     CLOSE_PAREN = 7, OPEN_BRACE = 8, CLOSE_BRACE = 9, ARROW = 10, EQ = 11, 
     EQUAL = 12, NOT_EQ = 13, GREATER_THAN = 14, LESS_THAN = 15, MINUS = 16, 
     DOT = 17, POWER = 18, STAR = 19, DIV = 20, MOD = 21, ADD = 22, AND = 23, 
-    OR = 24, NEXT_LINE = 25, Comment = 26, WS = 27, Id = 28, String = 29, 
-    Number = 30
+    OR = 24, INDENT = 25, RETURN = 26, Comment = 27, WS = 28, Id = 29, String = 30, 
+    Number = 31
   };
 
   explicit CkuraLexer(antlr4::CharStream *input);

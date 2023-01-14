@@ -14,7 +14,7 @@ extern unordered_map<string, Value *> memory;
 
 int main(int argc, char *argv[]) {
   // set log level
-  set_level(level::debug);
+  set_level(level::info);
   // parse cli
   string input_file = "", output_file = "";
   auto cli = (value("input file", input_file),
@@ -26,25 +26,26 @@ int main(int argc, char *argv[]) {
 
   // init llvm
   llvm_context = make_unique<LLVMContext>();
-  llvm_module = make_unique<Module>("my cool jit", *llvm_context);
+  llvm_module = make_unique<Module>("MainModule", *llvm_context);
   llvm_builder = make_unique<IRBuilder<>>(*llvm_context);
 
   // antlr4 lex and parse
-  cout << "Start lexing with input file " << input_file << "." << endl;
+  info("Start lexing with input file {}.", input_file);
   ifstream stream(input_file);
   antlr4::ANTLRInputStream input(stream);
   CkuraLexer lexer(&input);
   antlr4::CommonTokenStream tokens(&lexer);
-  cout << "Start parsing...";
+  info("Start parsing.");
   CkuraParser parser(&tokens);
-  cout << "Parse complete." << endl;
+  info("Parse completed.");
   stream.close();
+  info("File stream closed.");
 
   antlr4::tree::ParseTree *tree = parser.module();
-  cout << "Start visiting..." << endl;
+  info("Start going through the visitor.");
   CkuraVisitor visitor;
   visitor.visit(tree);
-  cout << "Visit complete." << endl;
+  info("Visit complete.");
   visitor.accessVariable("res")->print(errs());
   llvm_module->dump();
   return 0;

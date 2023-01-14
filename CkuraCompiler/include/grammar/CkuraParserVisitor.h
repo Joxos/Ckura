@@ -27,6 +27,8 @@ public:
 
     virtual std::any visitMultiLevel(CkuraParser::MultiLevelContext *context) = 0;
 
+    virtual std::any visitFuncCallLevel(CkuraParser::FuncCallLevelContext *context) = 0;
+
     virtual std::any visitParenLevel(CkuraParser::ParenLevelContext *context) = 0;
 
     virtual std::any visitLiteralLevel(CkuraParser::LiteralLevelContext *context) = 0;
@@ -47,11 +49,23 @@ public:
 
     virtual std::any visitDefineVariable(CkuraParser::DefineVariableContext *context) = 0;
 
+    virtual std::any visitFunctionBody(CkuraParser::FunctionBodyContext *context) = 0;
+
+    virtual std::any visitFunctionArgument(CkuraParser::FunctionArgumentContext *context) = 0;
+
+    virtual std::any visitFunctionHead(CkuraParser::FunctionHeadContext *context) = 0;
+
+    virtual std::any visitFunctionReturn(CkuraParser::FunctionReturnContext *context) = 0;
+
+    virtual std::any visitDefineFunction(CkuraParser::DefineFunctionContext *context) = 0;
+
+    virtual std::any visitFunctionCall(CkuraParser::FunctionCallContext *context) = 0;
+
     virtual std::any visitStatement(CkuraParser::StatementContext *context) = 0;
 
-    virtual std::any visitUnit(CkuraParser::UnitContext *context) = 0;
+    virtual std::any visitBlock(CkuraParser::BlockContext *context) = 0;
 
-    virtual std::any visitLastUnit(CkuraParser::LastUnitContext *context) = 0;
+    virtual std::any visitUnit(CkuraParser::UnitContext *context) = 0;
 
     virtual std::any visitModule(CkuraParser::ModuleContext *context) = 0;
 

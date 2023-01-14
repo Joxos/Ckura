@@ -16,13 +16,15 @@ public:
     CLOSE_PAREN = 7, OPEN_BRACE = 8, CLOSE_BRACE = 9, ARROW = 10, EQ = 11, 
     EQUAL = 12, NOT_EQ = 13, GREATER_THAN = 14, LESS_THAN = 15, MINUS = 16, 
     DOT = 17, POWER = 18, STAR = 19, DIV = 20, MOD = 21, ADD = 22, AND = 23, 
-    OR = 24, NEXT_LINE = 25, Comment = 26, WS = 27, Id = 28, String = 29, 
-    Number = 30
+    OR = 24, INDENT = 25, RETURN = 26, Comment = 27, WS = 28, Id = 29, String = 30, 
+    Number = 31
   };
 
   enum {
     RuleLiteralValue = 0, RuleExpression = 1, RuleDeclareVariable = 2, RuleDefineVariable = 3, 
-    RuleStatement = 4, RuleUnit = 5, RuleLastUnit = 6, RuleModule = 7
+    RuleFunctionBody = 4, RuleFunctionArgument = 5, RuleFunctionHead = 6, 
+    RuleFunctionReturn = 7, RuleDefineFunction = 8, RuleFunctionCall = 9, 
+    RuleStatement = 10, RuleBlock = 11, RuleUnit = 12, RuleModule = 13
   };
 
   explicit CkuraParser(antlr4::TokenStream *input);
@@ -46,9 +48,15 @@ public:
   class ExpressionContext;
   class DeclareVariableContext;
   class DefineVariableContext;
+  class FunctionBodyContext;
+  class FunctionArgumentContext;
+  class FunctionHeadContext;
+  class FunctionReturnContext;
+  class DefineFunctionContext;
+  class FunctionCallContext;
   class StatementContext;
+  class BlockContext;
   class UnitContext;
-  class LastUnitContext;
   class ModuleContext; 
 
   class  LiteralValueContext : public antlr4::ParserRuleContext {
@@ -116,6 +124,15 @@ public:
     antlr4::tree::TerminalNode *STAR();
     antlr4::tree::TerminalNode *DIV();
     antlr4::tree::TerminalNode *MOD();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  FuncCallLevelContext : public ExpressionContext {
+  public:
+    FuncCallLevelContext(ExpressionContext *ctx);
+
+    FunctionCallContext *functionCall();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
@@ -245,11 +262,113 @@ public:
 
   DefineVariableContext* defineVariable();
 
+  class  FunctionBodyContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionBodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<UnitContext *> unit();
+    UnitContext* unit(size_t i);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionBodyContext* functionBody();
+
+  class  FunctionArgumentContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionArgumentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    DeclareVariableContext *declareVariable();
+    DefineVariableContext *defineVariable();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionArgumentContext* functionArgument();
+
+  class  FunctionHeadContext : public antlr4::ParserRuleContext {
+  public:
+    antlr4::Token *returnType = nullptr;
+    antlr4::Token *functionName = nullptr;
+    FunctionHeadContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *OPEN_PAREN();
+    std::vector<FunctionArgumentContext *> functionArgument();
+    FunctionArgumentContext* functionArgument(size_t i);
+    antlr4::tree::TerminalNode *CLOSE_PAREN();
+    std::vector<antlr4::tree::TerminalNode *> Id();
+    antlr4::tree::TerminalNode* Id(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionHeadContext* functionHead();
+
+  class  FunctionReturnContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionReturnContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *RETURN();
+    ExpressionContext *expression();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionReturnContext* functionReturn();
+
+  class  DefineFunctionContext : public antlr4::ParserRuleContext {
+  public:
+    DefineFunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    FunctionHeadContext *functionHead();
+    antlr4::tree::TerminalNode *OPEN_BRACE();
+    FunctionBodyContext *functionBody();
+    antlr4::tree::TerminalNode *CLOSE_BRACE();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  DefineFunctionContext* defineFunction();
+
+  class  FunctionCallContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *Id();
+    antlr4::tree::TerminalNode *OPEN_PAREN();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    antlr4::tree::TerminalNode *CLOSE_PAREN();
+    std::vector<antlr4::tree::TerminalNode *> COMMA();
+    antlr4::tree::TerminalNode* COMMA(size_t i);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionCallContext* functionCall();
+
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *SEMI_COLON();
     DefineVariableContext *defineVariable();
+    FunctionReturnContext *functionReturn();
+    FunctionCallContext *functionCall();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -258,12 +377,25 @@ public:
 
   StatementContext* statement();
 
+  class  BlockContext : public antlr4::ParserRuleContext {
+  public:
+    BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    DefineFunctionContext *defineFunction();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  BlockContext* block();
+
   class  UnitContext : public antlr4::ParserRuleContext {
   public:
     UnitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     StatementContext *statement();
-    antlr4::tree::TerminalNode *NEXT_LINE();
+    BlockContext *block();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -272,26 +404,13 @@ public:
 
   UnitContext* unit();
 
-  class  LastUnitContext : public antlr4::ParserRuleContext {
-  public:
-    LastUnitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    StatementContext *statement();
-
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  LastUnitContext* lastUnit();
-
   class  ModuleContext : public antlr4::ParserRuleContext {
   public:
     ModuleContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EOF();
     std::vector<UnitContext *> unit();
     UnitContext* unit(size_t i);
-    LastUnitContext *lastUnit();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

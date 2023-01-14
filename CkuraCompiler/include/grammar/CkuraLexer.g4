@@ -26,12 +26,13 @@ MOD: '%';
 ADD: '+';
 AND: 'and';
 OR: 'or';
-NEXT_LINE: '\n';
+INDENT: '    ';
+RETURN: 'return';
 
 Comment
-    : DIV DIV ~[\r\n\f]* NEXT_LINE -> channel(HIDDEN);
+    : DIV DIV ~[\r\n\f]* -> channel(HIDDEN);
 WS
-    : [ \r\t\n\f]+ -> channel(HIDDEN);
+    : [ \r\n\t\f]+ -> channel(HIDDEN);
 
 fragment NonZeroDigit
     : [1-9];

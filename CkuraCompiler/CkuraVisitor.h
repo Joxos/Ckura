@@ -102,4 +102,8 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
         any_cast<Value *>(visit(ctx->expression()))));
     return nullptr;
   }
+
+  virtual std::any visitFuncCallLevel(CkuraParser::FuncCallLevelContext *ctx) override {
+    return visitChildren(ctx);
+  }
 };

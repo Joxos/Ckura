@@ -4,13 +4,15 @@ options {
     tokenVocab = CkuraLexer;
 }
 
+// expression part
 literalValue
     : String  # string
     | Number # number
     | Id  # id
     ;
 expression
-    : literalValue # literalLevel
+    : functionCall  # funcCallLevel
+    | literalValue # literalLevel
     | OPEN_PAREN expression CLOSE_PAREN  # parenLevel
     | expression op=POWER expression  # powerLevel
     | expression op=(STAR|DIV|MOD) expression  # multiLevel
@@ -20,28 +22,35 @@ expression
     | expression op=AND expression  # andLevel
     | expression op=OR expression  # orLevel
     ;
+
+// variable part
 declareVariable
     : expression Id;
 defineVariable
     : declareVariable EQ expression;
+
+// function part
+functionBody
+    : unit*;
+functionArgument
+    : declareVariable|defineVariable;
+functionHead
+    : returnType=Id functionName=Id OPEN_PAREN (functionArgument COMMA)* functionArgument CLOSE_PAREN;
+functionReturn
+    : RETURN expression;
+defineFunction
+    : functionHead OPEN_BRACE functionBody CLOSE_BRACE;
+functionCall
+    : Id OPEN_PAREN (expression COMMA)* expression CLOSE_PAREN;
+
+// top-level parser
 statement
-    : defineVariable
+    :
+    (defineVariable
+    | functionReturn
+    | functionCall)
+    SEMI_COLON
     ;
-unit: statement NEXT_LINE;
-lastUnit: statement;
-module: unit* lastUnit?;
-// statement
-//     :
-//     ( defineVariable
-//     | assignVariable)
-//     SEMI_COLON;
-// block
-//     : defineFunction;
-// assignVariable
-//     : Id EQ expression;
-// defineFunction
-//     : Id OPEN_PAREN (argument (COMMA argument)*)? CLOSE_PAREN (ARROW expression)? body;
-// argument
-//     : defineVariable|declareVariable;
-// body
-//     : OPEN_BRACE (block|statement)* CLOSE_BRACE;
+block: defineFunction;
+unit: statement|block;
+module: unit* EOF;
