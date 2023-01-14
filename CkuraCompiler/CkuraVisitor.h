@@ -97,9 +97,9 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   virtual std::any visitDefineVariable(
       CkuraParser::DefineVariableContext *ctx) override {
     auto type = ctx->declareVariable()->expression();
-    memory.insert(
-        pair<string, Value *>(ctx->declareVariable()->Id()->getText(),
-                              any_cast<Value *>(visit(ctx->expression()))));
+    memory.insert(make_pair<string, Value *>(
+        ctx->declareVariable()->Id()->getText(),
+        any_cast<Value *>(visit(ctx->expression()))));
     return nullptr;
   }
 };

@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   CkuraVisitor visitor;
   visitor.visit(tree);
   cout << "Visit complete." << endl;
-  visitor.accessVariable("number")->print(errs());
+  visitor.accessVariable("res")->print(errs());
   llvm_module->dump();
   return 0;
 }
