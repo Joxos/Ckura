@@ -32,8 +32,10 @@ defineVariable
 // function part
 functionBody
     : unit*;
+functionDeclareVariable
+    : Id;
 functionArgument
-    : declareVariable|defineVariable;
+    : functionDeclareVariable;
 functionHead
     : returnType=Id functionName=Id OPEN_PAREN (functionArgument COMMA)* functionArgument CLOSE_PAREN;
 functionReturn

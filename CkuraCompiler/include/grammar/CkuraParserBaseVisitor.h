@@ -79,6 +79,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitFunctionDeclareVariable(CkuraParser::FunctionDeclareVariableContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitFunctionArgument(CkuraParser::FunctionArgumentContext *ctx) override {
     return visitChildren(ctx);
   }

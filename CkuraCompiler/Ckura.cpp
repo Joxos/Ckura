@@ -6,15 +6,24 @@
 using clipp::option;
 using clipp::value;
 
+// LLVM related
 extern unique_ptr<LLVMContext> llvm_context;
 extern unique_ptr<Module> llvm_module;
 extern unique_ptr<IRBuilder<>> llvm_builder;
 
+// variable memroy
 extern unordered_map<string, Value *> memory;
+
+// function generation
+extern string function_name;
+extern Value *ret_val;
+extern vector<string> temp_args;
+extern unordered_map<string, Value *> function_args;
 
 int main(int argc, char *argv[]) {
   // set log level
-  set_level(level::info);
+  set_level(level::debug);
+
   // parse cli
   string input_file = "", output_file = "";
   auto cli = (value("input file", input_file),
@@ -24,12 +33,14 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
 
-  // init llvm
+  // init global values
+  // LLVM related
   llvm_context = make_unique<LLVMContext>();
   llvm_module = make_unique<Module>("MainModule", *llvm_context);
   llvm_builder = make_unique<IRBuilder<>>(*llvm_context);
 
   // antlr4 lex and parse
+  function_name = "";
   info("Start lexing with input file {}.", input_file);
   ifstream stream(input_file);
   antlr4::ANTLRInputStream input(stream);
@@ -46,7 +57,6 @@ int main(int argc, char *argv[]) {
   CkuraVisitor visitor;
   visitor.visit(tree);
   info("Visit complete.");
-  visitor.accessVariable("res")->print(errs());
   llvm_module->dump();
   return 0;
 }

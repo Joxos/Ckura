@@ -9,7 +9,7 @@ message (STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 if (NOT TARGET spdlog)
     # Stand-alone build
     find_package (spdlog REQUIRED)
-    message (STATUS "Found spdlog")
+    message (STATUS "Found spdlog.")
 endif()
 
 set (CMAKE_CXX_STANDARD 17)
@@ -17,7 +17,7 @@ set (CMAKE_CXX_STANDARD 17)
 # set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -v")
 # set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
-# set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories (./include/antlr4/
                      ./include/grammar/
@@ -42,7 +42,6 @@ target_link_libraries (ckura ${llvm_libs})
 target_link_libraries (ckura spdlog::spdlog)
 
 # copy dll
-message ("${CMAKE_SOURCE_DIR}")
-add_custom_command (TARGET ckura POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/CkuraCompiler/antlr4-runtime.dll
-                    ${CMAKE_CURRENT_BINARY_DIR}/Debug/antlr4-runtime.dll)
+#add_custom_command (TARGET ckura POST_BUILD
+#                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/CkuraCompiler/antlr4-runtime.dll
+#                    ${CMAKE_CURRENT_BINARY_DIR}/Debug/antlr4-runtime.dll)

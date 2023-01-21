@@ -51,6 +51,8 @@ public:
 
     virtual std::any visitFunctionBody(CkuraParser::FunctionBodyContext *context) = 0;
 
+    virtual std::any visitFunctionDeclareVariable(CkuraParser::FunctionDeclareVariableContext *context) = 0;
+
     virtual std::any visitFunctionArgument(CkuraParser::FunctionArgumentContext *context) = 0;
 
     virtual std::any visitFunctionHead(CkuraParser::FunctionHeadContext *context) = 0;

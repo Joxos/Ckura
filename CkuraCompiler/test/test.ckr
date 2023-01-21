@@ -1,13 +1,13 @@
 // Test 1:
 // res=-61
-number a = -5+2*10;
-number res = -2-(-3)/3-4*a;
+//number a = -5+2*10;
+//number res = -2-(-3)/3-4*a;
 
 // Test 2:
-//number f(number x,number y=10){
-//    number a = 3+x*y;
-//    return a;
-//}
+number f(x){
+    number a=x+3;
+    return a;
+}
 //f(3);
 
 //string name = "Jox" + "os"

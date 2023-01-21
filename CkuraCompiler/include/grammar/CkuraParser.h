@@ -22,9 +22,10 @@ public:
 
   enum {
     RuleLiteralValue = 0, RuleExpression = 1, RuleDeclareVariable = 2, RuleDefineVariable = 3, 
-    RuleFunctionBody = 4, RuleFunctionArgument = 5, RuleFunctionHead = 6, 
-    RuleFunctionReturn = 7, RuleDefineFunction = 8, RuleFunctionCall = 9, 
-    RuleStatement = 10, RuleBlock = 11, RuleUnit = 12, RuleModule = 13
+    RuleFunctionBody = 4, RuleFunctionDeclareVariable = 5, RuleFunctionArgument = 6, 
+    RuleFunctionHead = 7, RuleFunctionReturn = 8, RuleDefineFunction = 9, 
+    RuleFunctionCall = 10, RuleStatement = 11, RuleBlock = 12, RuleUnit = 13, 
+    RuleModule = 14
   };
 
   explicit CkuraParser(antlr4::TokenStream *input);
@@ -49,6 +50,7 @@ public:
   class DeclareVariableContext;
   class DefineVariableContext;
   class FunctionBodyContext;
+  class FunctionDeclareVariableContext;
   class FunctionArgumentContext;
   class FunctionHeadContext;
   class FunctionReturnContext;
@@ -276,12 +278,24 @@ public:
 
   FunctionBodyContext* functionBody();
 
+  class  FunctionDeclareVariableContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionDeclareVariableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *Id();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionDeclareVariableContext* functionDeclareVariable();
+
   class  FunctionArgumentContext : public antlr4::ParserRuleContext {
   public:
     FunctionArgumentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    DeclareVariableContext *declareVariable();
-    DefineVariableContext *defineVariable();
+    FunctionDeclareVariableContext *functionDeclareVariable();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
