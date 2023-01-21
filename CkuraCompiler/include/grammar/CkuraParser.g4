@@ -33,7 +33,7 @@ defineVariable
 functionBody
     : unit*;
 functionDeclareVariable
-    : Id;
+    : expression Id;
 functionArgument
     : functionDeclareVariable;
 functionHead
