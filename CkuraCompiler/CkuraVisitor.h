@@ -29,13 +29,13 @@ unique_ptr<IRBuilder<>> llvm_builder;
 unordered_map<string, Value *> memory;
 
 // function generation
-string function_name;
+string fname;
 // for now we only support one return value
 // since antlr has aggregateResult() this fucking shit
 // we store the return value here
 Value *ret_val;
-vector<string> temp_args;
-unordered_map<string, Value *> function_args;
+vector<string> original_args;
+map<string, Value *> function_args;
 
 class CkuraVisitor : public CkuraParserBaseVisitor {
  public:
@@ -63,11 +63,21 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     // visit function_args first and then visit the global memory
     string Id = ctx->Id()->getText();
     auto imem = memory.find(Id);
-    auto ifunc = function_args.find(Id);
+    int ioriginal = -1;
+    for (int i = 0; i < original_args.size(); ++i) {
+      if (original_args[i] == Id) {
+        ioriginal = i;
+        break;
+      }
+    }
     if (imem != memory.end()) {
       return imem->second;
-    } else if (ifunc != function_args.end()) {
-      return ifunc->second;
+    } else if (ioriginal != -1) {
+      auto it = function_args.begin();
+      for (int i = 0; i < ioriginal; ++i) {
+        ++it;
+      }
+      return it->second;
     } else {
       error_and_exit(Exceptions::Errors::UndefinedId, {ctx->Id()->getText()});
     }
@@ -191,12 +201,12 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
       CkuraParser::FunctionHeadContext *ctx) override {
     // statisic args
     visitChildren(ctx);
-    std::vector<Type *> args(temp_args.size(),
+    std::vector<Type *> args(original_args.size(),
                              Type::getDoubleTy(*llvm_context));
     FunctionType *ft =
         FunctionType::get(Type::getDoubleTy(*llvm_context), args, false);
 
-    Function *f = Function::Create(ft, Function::ExternalLinkage, function_name,
+    Function *f = Function::Create(ft, Function::ExternalLinkage, fname,
                                    llvm_module.get());
 
     // set names for all arguments.
@@ -204,14 +214,14 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     function_args.clear();
     unsigned int i = 0;
     for (auto &arg : f->args()) {
-      arg.setName(Twine(temp_args[i]));
+      arg.setName(original_args[i]);
     }
 
     return f;
   }
   virtual std::any visitFunctionDeclareVariable(
       CkuraParser::FunctionDeclareVariableContext *ctx) override {
-    temp_args.push_back(ctx->Id()->getText());
+    original_args.push_back(ctx->Id()->getText());
     debug("Function decl var {}.", ctx->Id()->getText());
     return nullptr;
   }
@@ -224,16 +234,16 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   virtual std::any visitDefineFunction(
       CkuraParser::DefineFunctionContext *ctx) override {
     // parse function head
-    function_name = ctx->functionHead()->functionName->getText();
-    debug("Parse function head of {}.", function_name);
+    fname = ctx->functionHead()->functionName->getText();
+    debug("Parse function head of {}.", fname);
     // check if already defined
-    Function *f = llvm_module->getFunction(function_name);
+    Function *f = llvm_module->getFunction(fname);
     if (!f) {
       // we get original f from function head.
       f = any_cast<Function *>(visit(ctx->functionHead()));
     } else {
       // already defined. oops.
-      error("Function {} already difined.", function_name);
+      error("Function {} already difined.", fname);
       exit(-1);
     }
     if (!f) {
@@ -249,14 +259,13 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     }
 
     // parse function body
-    debug("Parse function body of {}.", function_name);
+    debug("Parse function body of {}.", fname);
     BasicBlock *bb = BasicBlock::Create(*llvm_context, "entry", f);
     llvm_builder->SetInsertPoint(bb);
+    visit(ctx->functionBody());
 
     // parse return statement
-    debug("Parse return statement of {}.",
-          ctx->functionHead()->functionName->getText());
-    visit(ctx->functionBody());
+    debug("Parse return statement of {}.", fname);
     if (ret_val) {
       llvm_builder->CreateRet(ret_val);
 
@@ -264,7 +273,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
       verifyFunction(*f);
     }
 
-    debug("Finished defining {}.", function_name);
+    debug("Finished defining {}.", fname);
     return f;
   }
 };

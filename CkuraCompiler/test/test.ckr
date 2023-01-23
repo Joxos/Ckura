@@ -4,10 +4,10 @@
 //number res = -2-(-3)/3-4*a;
 
 // Test 2:
-number f(number x){
-    number a=x+3;
-    return a;
+number my_plus(number a, number b, number c){
+    number temp = a + b + c;
+    return temp;
 }
-number a=f(3);
+number res = my_plus(3, 5, 7);
 
 //string name = "Jox" + "os"

@@ -15,10 +15,10 @@ extern unique_ptr<IRBuilder<>> llvm_builder;
 extern unordered_map<string, Value *> memory;
 
 // function generation
-extern string function_name;
+extern string fname;
 extern Value *ret_val;
-extern vector<string> temp_args;
-extern unordered_map<string, Value *> function_args;
+extern vector<string> original_args;
+extern map<string, Value *> function_args;
 
 int main(int argc, char *argv[]) {
   // set log level
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
   llvm_builder = make_unique<IRBuilder<>>(*llvm_context);
 
   // antlr4 lex and parse
-  function_name = "";
+  fname = "";
   info("Start lexing with input file {}.", input_file);
   ifstream stream(input_file);
   antlr4::ANTLRInputStream input(stream);
@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
   CkuraVisitor visitor;
   visitor.visit(tree);
   info("Visit complete.");
-  llvm_module->dump();
+  // llvm_module->dump();
+  llvm_module->print(errs(), nullptr);
   return 0;
 }
