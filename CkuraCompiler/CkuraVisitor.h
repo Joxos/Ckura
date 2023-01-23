@@ -112,33 +112,30 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   }
   virtual std::any visitFuncCallLevel(
       CkuraParser::FuncCallLevelContext *ctx) override {
-    Function *Callee =
+    Function *callee =
         llvm_module->getFunction(ctx->functionCall()->Id()->getText());
-    if (!Callee) {
-      error_and_exit(Exceptions::Errors::FunctionNotFound,
-                     {ctx->functionCall()->Id()->getText()});
+    string fname = ctx->functionCall()->Id()->getText();
+    if (!callee) {
+      error_and_exit(Exceptions::Errors::FunctionNotFound, {fname});
     }
 
-    debug("Callee->arg_size() == {}", Callee->arg_size());
-    debug("ctx->functionCall()->expression().size() + 1 == {}",
-          ctx->functionCall()->expression().size() + 1);
+    debug("Function need {} args...", callee->arg_size());
+    debug("was given {} args", ctx->functionCall()->expression().size());
     auto original_args = ctx->functionCall()->expression();
-    original_args.push_back(ctx->functionCall()->expression(1));
-    if (original_args.size() != Callee->arg_size()) {
-      error_and_exit(
-          Exceptions::Errors::InvalidFunctionCall,
-          {ctx->functionCall()->Id()->getText(), to_string(Callee->arg_size()),
-           to_string(original_args.size())});
+    if (original_args.size() != callee->arg_size()) {
+      error_and_exit(Exceptions::Errors::InvalidFunctionCall,
+                     {fname, to_string(callee->arg_size()),
+                      to_string(original_args.size())});
     }
 
     vector<Value *> args;
     for (auto i : original_args) {
-      any_cast<Value *>(visit(i))->print(errs());
+      // any_cast<Value *>(visit(i))->print(errs());
       args.push_back(any_cast<Value *>(visit(i)));
     }
 
     info("Finish call.");
-    return llvm_builder.get()->CreateCall(Callee, args, "calltmp");
+    return (Value *)llvm_builder.get()->CreateCall(callee, args, "calltmp");
   }
 
   // define and declare variables
@@ -166,31 +163,29 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   // function related
   virtual std::any visitFunctionCall(
       CkuraParser::FunctionCallContext *ctx) override {
-    Function *Callee = llvm_module->getFunction(ctx->Id()->getText());
-    if (!Callee) {
-      error_and_exit(Exceptions::Errors::FunctionNotFound,
-                     {ctx->Id()->getText()});
+    Function *callee = llvm_module->getFunction(ctx->Id()->getText());
+    string fname = ctx->Id()->getText();
+    if (!callee) {
+      error_and_exit(Exceptions::Errors::FunctionNotFound, {fname});
     }
 
-    debug("Callee->arg_size() == {}", Callee->arg_size());
-    debug("ctx->functionCall()->expression().size() + 1 == {}",
-          ctx->expression().size() + 1);
+    debug("Function need {} args...", callee->arg_size());
+    debug("was given {} args", ctx->expression().size());
     auto original_args = ctx->expression();
-    original_args.push_back(ctx->expression(1));
-    if (original_args.size() != Callee->arg_size()) {
+    if (original_args.size() != callee->arg_size()) {
       error_and_exit(Exceptions::Errors::InvalidFunctionCall,
-                     {ctx->Id()->getText(), to_string(Callee->arg_size()),
+                     {fname, to_string(callee->arg_size()),
                       to_string(original_args.size())});
     }
 
     vector<Value *> args;
     for (auto i : original_args) {
-      any_cast<Value *>(visit(i))->print(errs());
+      // any_cast<Value *>(visit(i))->print(errs());
       args.push_back(any_cast<Value *>(visit(i)));
     }
 
     info("Finish call.");
-    return llvm_builder.get()->CreateCall(Callee, args, "calltmp");
+    return (Value *)llvm_builder.get()->CreateCall(callee, args, "calltmp");
   }
   virtual std::any visitFunctionHead(
       CkuraParser::FunctionHeadContext *ctx) override {

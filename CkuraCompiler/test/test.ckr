@@ -8,6 +8,6 @@ number f(number x){
     number a=x+3;
     return a;
 }
-//f(3);
+number a=f(3);
 
 //string name = "Jox" + "os"

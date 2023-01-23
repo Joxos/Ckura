@@ -5,7 +5,7 @@ void error_and_exit(Exceptions::Errors e, initializer_list<string> ss) {
   auto i = ss.begin();
   switch (e) {
     case Exceptions::Errors::VariableNotFound:
-      error("Variable {} Not Found.", *i);
+      error("Variable {} not found.", *i);
       exit(-1);
       break;
     case Exceptions::Errors::UndefinedId:
@@ -13,7 +13,7 @@ void error_and_exit(Exceptions::Errors e, initializer_list<string> ss) {
       exit(-1);
       break;
     case Exceptions::Errors::FunctionNotFound:
-      error("Function {} Not Found.", *i);
+      error("Function {} not found.", *i);
       exit(-1);
       break;
     case Exceptions::Errors::InvalidFunctionCall:
@@ -22,7 +22,7 @@ void error_and_exit(Exceptions::Errors e, initializer_list<string> ss) {
       exit(-1);
       break;
     default:
-      error("Unknown Error \"{}\".", *i);
+      error("Unfinished error \"{}\".", *i);
       exit(-1);
       break;
   }
