@@ -64,6 +64,9 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     string Id = ctx->Id()->getText();
     auto imem = memory.find(Id);
     int ioriginal = -1;
+    // since LLVM fucking optimize arg name (or my problem setting its name)
+    // we need find it and store its index
+    // then get it from function_args
     for (int i = 0; i < original_args.size(); ++i) {
       if (original_args[i] == Id) {
         ioriginal = i;
