@@ -5,9 +5,8 @@
 
 // Test 2:
 number my_plus(number a, number b, number c){
-    number temp = a + b + c;
-    return temp;
+    return my_plus(1, 2, 3) * a - c * (b + 2);
 }
-number res = my_plus(3, 5, 7);
+number res = my_plus(4, 5, 7);
 
 //string name = "Jox" + "os"

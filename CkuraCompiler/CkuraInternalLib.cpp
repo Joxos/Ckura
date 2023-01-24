@@ -2,27 +2,26 @@
 
 namespace cil {
 void error_and_exit(Exceptions::Errors e, initializer_list<string> ss) {
-  auto i = ss.begin();
   switch (e) {
     case Exceptions::Errors::VariableNotFound:
-      error("Variable {} not found.", *i);
+      error("Variable {} not found.", *ss.begin());
       exit(-1);
       break;
     case Exceptions::Errors::UndefinedId:
-      error("Undefined ID {}.", *i);
+      error("Undefined ID {}.", *ss.begin());
       exit(-1);
       break;
     case Exceptions::Errors::FunctionNotFound:
-      error("Function {} not found.", *i);
+      error("Function {} not found.", *ss.begin());
       exit(-1);
       break;
     case Exceptions::Errors::InvalidFunctionCall:
-      error("Function {} has {} arguments but was given {}.", *(++i), *(++i),
-            *i);
+      error("Function {} has {} arguments but was given {}.", *ss.begin(),
+            *(ss.begin() + 1), *(ss.begin() + 2));
       exit(-1);
       break;
     default:
-      error("Unfinished error \"{}\".", *i);
+      error("Unfinished error \"{}\".", *ss.begin());
       exit(-1);
       break;
   }
