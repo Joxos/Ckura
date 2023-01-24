@@ -7,6 +7,6 @@
 number my_plus(number a, number b, number c){
     return my_plus(1, 2, 3) * a - c * (b + 2);
 }
-number res = my_plus(4, 5, 7);
+//number res = my_plus(4, 5, 7);
 
 //string name = "Jox" + "os"

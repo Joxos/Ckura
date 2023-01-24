@@ -39,27 +39,15 @@ map<string, Value *> function_args;
 
 class CkuraVisitor : public CkuraParserBaseVisitor {
  public:
-  Value *accessVariable(string var_name) {
-    Value *v = memory[var_name];
-    if (!v) {
-      // ops!
-      error_and_exit(Exceptions::Errors::VariableNotFound, {var_name});
-    } else {
-      return v;
-    }
-  }
-
   any visitString(CkuraParser::StringContext *ctx) override {
     // take the quotes
     return ctx->String()->getText();
   }
-
   any visitNumber(CkuraParser::NumberContext *ctx) override {
     return (Value *)ConstantFP::get(*llvm_context,
                                     APFloat(stod(ctx->Number()->getText())));
   }
-
-  virtual std::any visitId(CkuraParser::IdContext *ctx) override {
+  any visitId(CkuraParser::IdContext *ctx) override {
     // visit function_args first and then visit the global memory
     string Id = ctx->Id()->getText();
     auto imem = memory.find(Id);
@@ -87,12 +75,10 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   }
 
   // expression levels
-  virtual std::any visitParenLevel(
-      CkuraParser::ParenLevelContext *ctx) override {
+  any visitParenLevel(CkuraParser::ParenLevelContext *ctx) override {
     return visit(ctx->expression());
   }
-  virtual std::any visitMultiLevel(
-      CkuraParser::MultiLevelContext *ctx) override {
+  any visitMultiLevel(CkuraParser::MultiLevelContext *ctx) override {
     string op = ctx->op->getText();
     Value *l = any_cast<Value *>(visit(ctx->expression()[0]));
     Value *r = any_cast<Value *>(visit(ctx->expression()[1]));
@@ -106,7 +92,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     }
     return visitChildren(ctx);
   }
-  virtual std::any visitAddLevel(CkuraParser::AddLevelContext *ctx) override {
+  any visitAddLevel(CkuraParser::AddLevelContext *ctx) override {
     string op = ctx->op->getText();
     Value *l = any_cast<Value *>(visit(ctx->expression()[0]));
     Value *r = any_cast<Value *>(visit(ctx->expression()[1]));
@@ -117,14 +103,12 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     }
     return visitChildren(ctx);
   }
-  virtual std::any visitMinusLevel(
-      CkuraParser::MinusLevelContext *ctx) override {
+  any visitMinusLevel(CkuraParser::MinusLevelContext *ctx) override {
     Value *expr = any_cast<Value *>(visit(ctx->literalValue()));
     Value *zero = ConstantFP::get(*llvm_context, APFloat((double)0));
     return llvm_builder->CreateFSub(zero, expr, "subtmp");
   }
-  virtual std::any visitFuncCallLevel(
-      CkuraParser::FuncCallLevelContext *ctx) override {
+  any visitFuncCallLevel(CkuraParser::FuncCallLevelContext *ctx) override {
     Function *callee =
         llvm_module->getFunction(ctx->functionCall()->Id()->getText());
     string fname = ctx->functionCall()->Id()->getText();
@@ -152,8 +136,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   }
 
   // define and declare variables
-  virtual std::any visitDefineVariable(
-      CkuraParser::DefineVariableContext *ctx) override {
+  any visitDefineVariable(CkuraParser::DefineVariableContext *ctx) override {
     auto type = ctx->declareVariable()->expression();
     debug("Define variable {}.", ctx->declareVariable()->Id()->getText());
     memory.insert(make_pair<string, Value *>(
@@ -162,8 +145,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     debug("Variable {} defined.", ctx->declareVariable()->Id()->getText());
     return nullptr;
   }
-  virtual std::any visitDeclareVariable(
-      CkuraParser::DeclareVariableContext *ctx) override {
+  any visitDeclareVariable(CkuraParser::DeclareVariableContext *ctx) override {
     auto type = ctx->expression();
     debug("Declare variable {}.", ctx->Id()->getText());
     memory.insert(make_pair<string, Value *>(
@@ -174,8 +156,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
   }
 
   // function related
-  virtual std::any visitFunctionCall(
-      CkuraParser::FunctionCallContext *ctx) override {
+  any visitFunctionCall(CkuraParser::FunctionCallContext *ctx) override {
     Function *callee = llvm_module->getFunction(ctx->Id()->getText());
     string fname = ctx->Id()->getText();
     if (!callee) {
@@ -200,8 +181,7 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     info("Finish call.");
     return (Value *)llvm_builder.get()->CreateCall(callee, args, "calltmp");
   }
-  virtual std::any visitFunctionHead(
-      CkuraParser::FunctionHeadContext *ctx) override {
+  any visitFunctionHead(CkuraParser::FunctionHeadContext *ctx) override {
     // statisic args
     visitChildren(ctx);
     std::vector<Type *> args(original_args.size(),
@@ -222,20 +202,18 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
 
     return f;
   }
-  virtual std::any visitFunctionDeclareVariable(
+  any visitFunctionDeclareVariable(
       CkuraParser::FunctionDeclareVariableContext *ctx) override {
     original_args.push_back(ctx->Id()->getText());
     debug("Function decl var {}.", ctx->Id()->getText());
     return nullptr;
   }
-  virtual std::any visitFunctionReturn(
-      CkuraParser::FunctionReturnContext *ctx) override {
+  any visitFunctionReturn(CkuraParser::FunctionReturnContext *ctx) override {
     Value *a = any_cast<Value *>(visit(ctx->expression()));
     ret_val = a;
     return nullptr;
   }
-  virtual std::any visitDefineFunction(
-      CkuraParser::DefineFunctionContext *ctx) override {
+  any visitDefineFunction(CkuraParser::DefineFunctionContext *ctx) override {
     // parse function head
     fname = ctx->functionHead()->functionName->getText();
     debug("Parse function head of {}.", fname);
