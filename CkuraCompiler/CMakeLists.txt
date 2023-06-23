@@ -27,19 +27,23 @@ include_directories (./include/antlr4/
 separate_arguments (LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions (${LLVM_DEFINITIONS_LIST})
 
-link_directories (./lib/)
+link_directories (./libs/)
 
 add_executable (ckura Ckura.cpp
                       ./include/grammar/CkuraParserBaseVisitor.cpp
                       ./include/grammar/CkuraLexer.cpp
                       ./include/grammar/CkuraParser.cpp
-                      CkuraInternalLib.cpp)
+                      CkuraInternalLib.cpp )
 
 llvm_map_components_to_libnames (llvm_libs support core irreader)
 
 target_link_libraries (ckura antlr4-runtime)
 target_link_libraries (ckura ${llvm_libs})
 target_link_libraries (ckura spdlog::spdlog)
+
+add_custom_command(TARGET ckura POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${PROJECT_SOURCE_DIR}/CkuraCompiler/libs/antlr4-runtime.dll" $<TARGET_FILE_DIR:ckura>)
 
 # copy dll
 #add_custom_command (TARGET ckura POST_BUILD

@@ -8,11 +8,23 @@
 #include "CkuraInternalLib.h"
 #include "CkuraLexer.h"
 #include "CkuraParserBaseVisitor.h"
+#include "llvm/ADT/APFloat.h"
+//#include "llvm/ADT/STLExtras.h"
+//#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
+//#include "llvm/Support/TargetSelect.h"
+//#include "llvm/Target/TargetMachine.h"
+//#include "llvm/Transforms/InstCombine/InstCombine.h"
+//#include "llvm/Transforms/Scalar.h"
+//#include "llvm/Transforms/Scalar/GVN.h"
 #include "spdlog/spdlog.h"
 
 using namespace std;
@@ -20,23 +32,26 @@ using namespace llvm;
 using namespace spdlog;
 using namespace cil;
 
+// extern global variables
 // LLVM related
-unique_ptr<LLVMContext> llvm_context;
-unique_ptr<Module> llvm_module;
-unique_ptr<IRBuilder<>> llvm_builder;
+extern unique_ptr<LLVMContext> llvm_context;
+extern unique_ptr<Module> llvm_module;
+extern unique_ptr<IRBuilder<>> llvm_builder;
+// extern unique_ptr<KaleidoscopeJIT> llvm_jit;
 
 // variable memroy
-unordered_map<string, Value *> memory;
+extern unordered_map<string, Value *> memory;
 
 // function generation
-string fname;
+extern string fname;
 // for now we only support one return value
 // since antlr has aggregateResult() this fucking shit
 // we store the return value here
-Value *ret_val;
-vector<string> original_args;
-map<string, Value *> function_args;
+extern Value *ret_val;
+extern vector<string> original_args;
+extern map<string, Value *> function_args;
 
+// define the class
 class CkuraVisitor : public CkuraParserBaseVisitor {
  public:
   any visitString(CkuraParser::StringContext *ctx) override {
@@ -258,3 +273,5 @@ class CkuraVisitor : public CkuraParserBaseVisitor {
     return f;
   }
 };
+
+void InitializeModuleAndPassManager(void);
